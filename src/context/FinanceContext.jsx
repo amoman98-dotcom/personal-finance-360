@@ -53,6 +53,24 @@ export const FinanceProvider = ({ children }) => {
     setGoals((prev) => [...prev, { ...goal, id: `g-${Date.now()}` }]);
   };
 
+  const loadDemoData = () => {
+    setTransactions(initialTransactions);
+    setBudgets(initialBudgets);
+    setGoals(initialGoals);
+    localStorage.setItem('pf360_transactions', JSON.stringify(initialTransactions));
+    localStorage.setItem('pf360_budgets', JSON.stringify(initialBudgets));
+    localStorage.setItem('pf360_goals', JSON.stringify(initialGoals));
+  };
+
+  const clearAllData = () => {
+    setTransactions([]);
+    setBudgets([]);
+    setGoals([]);
+    localStorage.removeItem('pf360_transactions');
+    localStorage.removeItem('pf360_budgets');
+    localStorage.removeItem('pf360_goals');
+  };
+
   return (
     <FinanceContext.Provider
       value={{
@@ -62,7 +80,9 @@ export const FinanceProvider = ({ children }) => {
         addTransaction,
         deleteTransaction,
         addOrUpdateBudget,
-        addGoal
+        addGoal,
+        loadDemoData,
+        clearAllData
       }}
     >
       {children}

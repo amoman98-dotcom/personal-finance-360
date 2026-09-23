@@ -1,6 +1,6 @@
 import { useSpendingInsights } from '../hooks/useSpendingInsights';
 import { useFinance } from '../context/FinanceContext';
-import { TrendingUp, TrendingDown, Wallet, Flame, Plus } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, Flame, Plus, Database, RotateCcw } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';
 import { Link } from 'react-router-dom';
 
@@ -8,7 +8,7 @@ const COLORS = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6'];
 
 export const Dashboard = () => {
   const { totalIncome, totalExpense, netSavings, highestCategory, categoryDataForChart, overallBudgetUsage } = useSpendingInsights();
-  const { transactions } = useFinance();
+  const { transactions, loadDemoData, clearAllData } = useFinance();
 
   const recentTransactions = transactions.slice(0, 5);
 
@@ -20,12 +20,35 @@ export const Dashboard = () => {
           <h2 className="text-2xl font-bold tracking-tight text-slate-900">Financial Dashboard</h2>
           <p className="text-sm text-slate-500">Overview of your real-time income, expenses, and insights.</p>
         </div>
-        <Link
-          to="/transactions"
-          className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm"
-        >
-          <Plus className="w-4 h-4" /> Add Transaction
-        </Link>
+
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            onClick={loadDemoData}
+            type="button"
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-semibold transition shadow-xs"
+            title="Populate pre-configured test transactions and budgets"
+          >
+            <Database className="w-3.5 h-3.5 text-indigo-600" />
+            <span>Load Demo Data</span>
+          </button>
+
+          <button
+            onClick={clearAllData}
+            type="button"
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 border border-slate-200 rounded-lg text-xs font-semibold transition shadow-xs"
+            title="Reset active transactions to zero"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>Reset</span>
+          </button>
+
+          <Link
+            to="/transactions"
+            className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm"
+          >
+            <Plus className="w-4 h-4" /> Add Transaction
+          </Link>
+        </div>
       </div>
 
       {/* KPI Cards */}
@@ -133,17 +156,21 @@ export const Dashboard = () => {
           </Link>
         </div>
         <div className="divide-y divide-slate-100">
-          {recentTransactions.map((tx) => (
-            <div key={tx.id} className="py-3 flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-slate-900">{tx.title}</p>
-                <span className="text-xs text-slate-400">{tx.date} • {tx.category}</span>
+          {recentTransactions.length === 0 ? (
+            <p className="py-6 text-center text-xs text-slate-400">No transactions recorded yet. Click "Load Demo Data" to populate sample metrics.</p>
+          ) : (
+            recentTransactions.map((tx) => (
+              <div key={tx.id} className="py-3 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-900">{tx.title}</p>
+                  <span className="text-xs text-slate-400">{tx.date} • {tx.category}</span>
+                </div>
+                <span className={`text-sm font-semibold ${tx.type === 'income' ? 'text-emerald-600' : 'text-slate-900'}`}>
+                  {tx.type === 'income' ? '+' : '-'}${Number(tx.amount).toLocaleString()}
+                </span>
               </div>
-              <span className={`text-sm font-semibold ${tx.type === 'income' ? 'text-emerald-600' : 'text-slate-900'}`}>
-                {tx.type === 'income' ? '+' : '-'}${Number(tx.amount).toLocaleString()}
-              </span>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>

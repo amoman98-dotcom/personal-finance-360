@@ -182,3 +182,12 @@
     border-right-color: var(--border);
   }
 }
+ 
+html:not(.dark) {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+html:not(.dark) img,
+html:not(.dark) video {
+  filter: invert(1) hue-rotate(180deg);
+}

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useFinance } from '../context/FinanceContext';
 import { TransactionModal } from '../components/transactions/TransactionModal';
-import { Plus, Search, Trash2, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { Plus, Search, Trash2, ArrowUpRight, ArrowDownLeft, Download } from 'lucide-react';
 
 export const Transactions = () => {
   const { transactions, deleteTransaction } = useFinance();
@@ -19,8 +19,9 @@ export const Transactions = () => {
   const filteredTransactions = useMemo(() => {
     return transactions
       .filter((t) => {
-        const matchesSearch = t.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                              (t.note && t.note.toLowerCase().includes(searchTerm.toLowerCase()));
+        const matchesSearch =
+          t.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (t.note && t.note.toLowerCase().includes(searchTerm.toLowerCase()));
         const matchesCategory = categoryFilter === 'All' || t.category === categoryFilter;
         const matchesType = typeFilter === 'All' || t.type === typeFilter;
         return matchesSearch && matchesCategory && matchesType;
@@ -34,6 +35,33 @@ export const Transactions = () => {
       });
   }, [transactions, searchTerm, categoryFilter, typeFilter, sortBy]);
 
+  const handleExportCSV = () => {
+    if (!filteredTransactions.length) return;
+
+    const headers = ['ID', 'Title', 'Type', 'Category', 'Amount', 'Date', 'Note'];
+    const rows = filteredTransactions.map((tx) => [
+      tx.id,
+      `"${(tx.title || '').replace(/"/g, '""')}"`,
+      tx.type,
+      `"${(tx.category || '').replace(/"/g, '""')}"`,
+      tx.amount,
+      tx.date,
+      `"${(tx.note || '').replace(/"/g, '""')}"`,
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map((row) => row.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `transactions_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -41,15 +69,23 @@ export const Transactions = () => {
           <h2 className="text-2xl font-bold tracking-tight text-slate-900">Transactions Management</h2>
           <p className="text-sm text-slate-500">Track, search, filter, and organize all your financial records.</p>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm"
-        >
-          <Plus className="w-4 h-4" /> Add Transaction
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleExportCSV}
+            disabled={filteredTransactions.length === 0}
+            className="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors border border-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Download className="w-4 h-4 text-slate-500" /> Export CSV
+          </button>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm"
+          >
+            <Plus className="w-4 h-4" /> Add Transaction
+          </button>
+        </div>
       </div>
 
-      {/* Control Bar: Search & Filters */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs grid grid-cols-1 md:grid-cols-4 gap-3">
         <div className="relative">
           <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
@@ -81,7 +117,9 @@ export const Transactions = () => {
             className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
           >
             {categories.map((c) => (
-              <option key={c} value={c}>{c === 'All' ? 'All Categories' : c}</option>
+              <option key={c} value={c}>
+                {c === 'All' ? 'All Categories' : c}
+              </option>
             ))}
           </select>
         </div>
@@ -100,7 +138,6 @@ export const Transactions = () => {
         </div>
       </div>
 
-      {/* Transactions Table */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -125,8 +162,16 @@ export const Transactions = () => {
                   <tr key={tx.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${tx.type === 'income' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
-                          {tx.type === 'income' ? <ArrowDownLeft className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
+                        <div
+                          className={`p-2 rounded-lg ${
+                            tx.type === 'income' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
+                          }`}
+                        >
+                          {tx.type === 'income' ? (
+                            <ArrowDownLeft className="w-4 h-4" />
+                          ) : (
+                            <ArrowUpRight className="w-4 h-4" />
+                          )}
                         </div>
                         <div>
                           <p className="font-semibold text-slate-900">{tx.title}</p>
@@ -139,9 +184,7 @@ export const Transactions = () => {
                         {tx.category}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 text-slate-500 text-xs">
-                      {tx.date}
-                    </td>
+                    <td className="py-3.5 px-4 text-slate-500 text-xs">{tx.date}</td>
                     <td className="py-3.5 px-4 font-semibold">
                       <span className={tx.type === 'income' ? 'text-emerald-600' : 'text-slate-900'}>
                         {tx.type === 'income' ? '+' : '-'}${Number(tx.amount).toLocaleString()}

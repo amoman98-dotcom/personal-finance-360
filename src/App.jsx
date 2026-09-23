@@ -7,7 +7,7 @@ import { Transactions } from './pages/Transactions';
 import { Budgets } from './pages/Budgets';
 import { SavingsGoals } from './pages/SavingsGoals';
 import { Analytics } from './pages/Analytics';
-import { Auth } from './pages/Auth';
+import Auth from './pages/Auth';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
