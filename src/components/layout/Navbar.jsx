@@ -1,14 +1,24 @@
-import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ReceiptText, PieChart, Target, WalletCards } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, ReceiptText, PieChart, Target, LineChart, WalletCards, LogOut } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 const navItems = [
   { name: 'Dashboard', path: '/', icon: LayoutDashboard },
   { name: 'Transactions', path: '/transactions', icon: ReceiptText },
   { name: 'Budgets', path: '/budgets', icon: PieChart },
   { name: 'Savings Goals', path: '/goals', icon: Target },
+  { name: 'Spending Insights', path: '/analytics', icon: LineChart },
 ];
 
 export const Navbar = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/auth');
+  };
+
   return (
     <aside className="w-64 bg-slate-900 text-white min-h-screen flex flex-col p-4 border-r border-slate-800">
       <div className="flex items-center gap-3 px-2 py-4 mb-6">
@@ -43,9 +53,18 @@ export const Navbar = () => {
         })}
       </nav>
 
-      <div className="p-3 bg-slate-800/60 rounded-xl border border-slate-700/50 mt-auto">
-        <p className="text-xs font-medium text-slate-300">Logged in as</p>
-        <p className="text-sm font-semibold text-white truncate">User Account</p>
+      <div className="p-3 bg-slate-800/60 rounded-xl border border-slate-700/50 mt-auto flex items-center justify-between">
+        <div className="overflow-hidden">
+          <p className="text-xs font-medium text-slate-400">User</p>
+          <p className="text-sm font-semibold text-white truncate">{user?.name || 'Moumen'}</p>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg transition-colors"
+          title="Sign out"
+        >
+          <LogOut className="w-4 h-4" />
+        </button>
       </div>
     </aside>
   );
