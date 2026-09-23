@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, ReceiptText, PieChart, Target, LineChart, WalletCards, LogOut, Menu, X, Sparkles } from 'lucide-react';
+import { LayoutDashboard, ReceiptText, PieChart, Target, LineChart, WalletCards, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const navItems = [
@@ -23,8 +23,8 @@ export const Navbar = () => {
 
   return (
     <>
-      {/* Mobile Top Header */}
-      <header className="lg:hidden bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 sticky top-0 z-40">
+      {/* Mobile Top Bar */}
+      <header className="md:hidden bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 sticky top-0 z-40 w-full">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 bg-indigo-600 rounded-lg">
             <WalletCards className="w-5 h-5 text-white" />
@@ -34,24 +34,24 @@ export const Navbar = () => {
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition"
-          aria-label="Toggle Navigation"
+          aria-label="Toggle Menu"
         >
           {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </header>
 
-      {/* Backdrop for Mobile */}
+      {/* Overlay Backdrop */}
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
-          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 md:hidden"
         />
       )}
 
-      {/* Sidebar Navigation */}
+      {/* Sidebar Drawer */}
       <aside
-        className={`fixed lg:static top-0 left-0 bottom-0 z-50 w-64 bg-slate-900 text-white min-h-screen flex flex-col p-4 border-r border-slate-800 transform transition-transform duration-300 ease-in-out shrink-0 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        className={`fixed md:static inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex flex-col p-4 border-r border-slate-800 transition-transform duration-300 ease-in-out shrink-0 min-h-screen ${
+          isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
         <div className="flex items-center justify-between px-2 py-4 mb-6 border-b border-slate-800/60 pb-5">
@@ -66,7 +66,7 @@ export const Navbar = () => {
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="lg:hidden p-1.5 text-slate-400 hover:text-white rounded-lg"
+            className="md:hidden p-1.5 text-slate-400 hover:text-white rounded-lg"
           >
             <X className="w-5 h-5" />
           </button>
