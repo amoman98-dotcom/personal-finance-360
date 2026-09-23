@@ -22,4 +22,4 @@ A comprehensive personal finance and budget tracking dashboard built with **Reac
 
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/your-username/personal-finance-360.git](https://github.com/your-username/personal-finance-360.git)
+   git clone [https://github.com/amoman98-dotcom/personal-finance-360.git](https://github.com/amoman98-dotcom/personal-finance-360.git)
